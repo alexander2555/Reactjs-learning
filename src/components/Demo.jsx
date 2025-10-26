@@ -1,64 +1,28 @@
-import { useState } from 'react'
-// import { useFetch } from './useFetch'
+import { useEffect, useRef, useState } from 'react'
+// import { useHover } from './useHover';
 
 function Demo() {
-  // const {
-  //   data,
-  //   isLoading,
-  //   error,
-  //   refetch
-  // } = useFetch('https://jsonplaceholder.typicode.com/posts')
+  // const { hovered, ref } = useHover();
+  const ref = useRef()
 
-  const [data, setData] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [hovered, setHovered] = useState(false)
 
-  const refetch = async ({
-    url = 'https://jsonplaceholder.typicode.com/posts',
-    params = {},
-  }) => {
-    setIsLoading(true)
+  const onMouseOver = () => setHovered(true)
+  const onMouseOut = () => setHovered(false)
 
-    const paramsQuery = Object.entries(params)
-    const paramsQueryString = paramsQuery.length
-      ? '/?' + paramsQuery.map(([key, val]) => `${key}=${val}`).join('&')
-      : ''
+  useEffect(() => {
+    const refEl = ref.current
 
-    try {
-      const res = await fetch(url + paramsQueryString)
+    refEl.addEventListener('mouseover', onMouseOver)
+    refEl.addEventListener('mouseout', onMouseOut)
 
-      if (!res.ok) {
-        throw new Error(res.status)
-      }
-
-      setData(await res.json())
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
+    return () => {
+      refEl.removeEventListener('mouseover', onMouseOver)
+      refEl.removeEventListener('mouseout', onMouseOut)
     }
-  }
+  }, [])
 
-  return (
-    <div>
-      <div>
-        <button
-          onClick={() =>
-            refetch({
-              params: {
-                _limit: 3,
-              },
-            })
-          }
-        >
-          Перезапросить
-        </button>
-      </div>
-      {isLoading && 'Загрузка...'}
-      {error && `Произошла ошибка: ${error}`}
-      {data && !isLoading && data.map(item => <div key={item.id}>{item.title}</div>)}
-    </div>
-  )
+  return <div ref={ref}>{hovered ? 'На меня навели мышку' : 'Наведи мышкой на меня'}</div>
 }
 
 export default Demo
