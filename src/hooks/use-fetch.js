@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export const useFetch = url => {
   const urlRef = useRef(url)
@@ -29,6 +29,10 @@ export const useFetch = url => {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    refetch({ url: urlRef.current })
+  }, [])
 
   return { data, isLoading, error, refetch }
 }
