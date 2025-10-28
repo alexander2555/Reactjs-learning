@@ -9,22 +9,25 @@ type UseLocalStorage = (key: string) => [
   },
 ]
 
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 export const useLocalStorage: UseLocalStorage = key => {
   const [value, setValue] = useState(localStorage.getItem(key))
 
   const itemKey = useRef(key)
 
-  const setItem = (val: LocalStorageSetValue) => {
-    localStorage.setItem(itemKey.current, val)
-    setValue(val)
-  }
+  const setItem = useCallback(
+    (val: LocalStorageSetValue) => {
+      localStorage.setItem(itemKey.current, val)
+      setValue(val)
+    },
+    [key],
+  )
 
-  const removeItem = () => {
+  const removeItem = useCallback(() => {
     localStorage.removeItem(itemKey.current)
     setValue(null)
-  }
+  }, [key])
 
   return [value, { setItem, removeItem }]
 }
